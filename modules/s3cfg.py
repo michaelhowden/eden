@@ -124,7 +124,7 @@ class S3Config(Storage):
         return self.base.get("google_analytics_tracking_id", None)
 
     # -------------------------------------------------------------------------
-    def get_youtube_video_id(self):
+    def get_youtube_id(self):
         """
             YouTube ID
         """
@@ -276,9 +276,15 @@ class S3Config(Storage):
 
     def get_auth_registration_pending(self):
         """ Message someone gets when they register & they need approving """
-        return self.auth.get("registration_pending",
-            "Registration is still pending approval from Approver (%s) - please wait until confirmation received." % \
-                self.get_mail_approver())
+        approver = self.get_mail_approver()
+        registration_pending = self.auth.get("registration_pending")
+        if not registration_pending:
+            if approver == "ADMIN":
+                registration_pending = "Registration is still pending approval from Administrator - please wait until confirmation received."
+            else:
+                registration_pending = "Registration is still pending approval from Approver (%s) - please wait until confirmation received." % \
+                                        self.get_mail_approver()
+        return registration_pending
 
     def get_auth_registration_pending_approval(self):
         """ Message someone gets when they register & they need approving """

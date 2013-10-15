@@ -1,4 +1,14 @@
 {{extend "layout.html"}}
-<h2>{{=T("Introduction Video")}}</h2>
-<iframe width="960" height="720" src="//www.youtube.com/embed/{{=settings.get_youtube_video_id()}}" frameborder="0" allowfullscreen></iframe>
+<h2>{{=T("Video Tutorial")}}</h2>
+{{youtube_id = settings.get_youtube_id()}}
+{{try:}}
+  {{for video in youtube_id:}}
+    <h3 id = '{{=video["id"]}}'>{{=video["title"]}}</h3>
+    <iframe width="960" height="720" src="//www.youtube.com/embed/{{=video["video_id"]}}" frameborder="0" allowfullscreen></iframe>
+    <br/><br/>
+  {{pass}}
+{{except:}}
+  <iframe width="960" height="720" src="//www.youtube.com/embed/{{=youtube_id}}" frameborder="0" allowfullscreen></iframe>
+{{pass}}
+  
 </div>

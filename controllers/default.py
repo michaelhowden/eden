@@ -1107,6 +1107,7 @@ def video():
                 from gluon.http import HTTP
                 raise HTTP("404", "Unable to open Custom View: %s" % view)
 
+    response.title = T("Video Tutorial")
     return dict()
 
 # -----------------------------------------------------------------------------

@@ -1164,6 +1164,8 @@ class S3ProjectActivityModel(S3Model):
                                    label = "%s (%s)" % (T("Time Taken"),
                                                         T("hours"))
                                    ),
+                             Field("number_people", "double",
+                                   label = "Number of People"),
                              s3_comments(),
                              *s3_meta_fields())
         # CRUD Strings
