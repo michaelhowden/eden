@@ -57,7 +57,7 @@ __all__ = ["S3ACLWidget",
            "S3LocationSelectorWidget2",
            "S3MultiSelectWidget",
            "S3OrganisationAutocompleteWidget",
-           "S3OrganisationChosenWidget",
+           "S3SelectChosenWidget",
            "S3OrganisationHierarchyWidget",
            "S3PersonAutocompleteWidget",
            "S3PentityAutocompleteWidget",
@@ -4700,9 +4700,15 @@ class S3OrganisationAutocompleteWidget(FormWidget):
                          args="search_ac",
                          vars={"filter":"~"})
         )
+
 # =============================================================================
-class S3OrganisationChosenWidget(OptionsWidget):
-    """ Uses the Chosen Jquery UI Widget """
+class S3SelectChosenWidget(OptionsWidget):
+    """
+    Enhances Select dropdowns:
+    - single selects have an Autocomplete search box 
+    - multi-selects have tag-style selection
+    Uses http://harvesthq.github.io/chosen/
+    """"
     def __call__(self, field, value, **attributes):
         s3 = current.response.s3
         if s3.debug:
@@ -4713,6 +4719,7 @@ class S3OrganisationChosenWidget(OptionsWidget):
         script = """$('[name="%s"]').chosen();""" % field.name
         current.response.s3.jquery_ready.append(script)
         return OptionsWidget.widget(field, value, **attributes)
+
 # =============================================================================
 class S3OrganisationHierarchyWidget(OptionsWidget):
     """ Renders an organisation_id SELECT as a menu """

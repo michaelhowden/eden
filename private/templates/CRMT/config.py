@@ -100,7 +100,7 @@ settings.security.audit_write = audit_write
 # Pre-Populate
 settings.base.prepopulate = ["CRMT"]
 
-settings.base.system_name = T("Community Resilience Mapping Tool DEMO")
+settings.base.system_name = T("Community Resilience Mapping Tool")
 settings.base.system_name_short = T("CRMT")
 
 # -----------------------------------------------------------------------------
@@ -158,8 +158,7 @@ settings.base.youtube_id = [ dict(id = "introduction",
                                   title = T("Tracking Outreach"),
                                   video_id = "HR-FtR2XkBU" ),
                             ]
-                                  
-#settings.base.youtube_id = "HR-FtR2XkBU"
+
 # -----------------------------------------------------------------------------
 # L10n (Localization) settings
 settings.L10n.languages = OrderedDict([
@@ -233,7 +232,6 @@ settings.search.filter_manager_allow_delete = False
 settings.search.filter_manager_save = "Save"
 settings.search.filter_manager_update = "Update"
 
-                       
 # -----------------------------------------------------------------------------
 # Filter forms - style for Summary pages
 def filter_formstyle(row_id, label, widget, comment, hidden=False):
@@ -985,7 +983,7 @@ def customize_org_organisation(**attr):
                     ),
                     "comments",
                 ]
-                if method not in ["create", "update"]:
+                if method not in ("create", "update"):
                     hrtable = s3db.hrm_human_resource
                     hrtable.person_id.widget = None
                     hrtable.site_id.label = T("Place")
@@ -1277,7 +1275,7 @@ def customize_org_facility(**attr):
                     # Custom Widgets/Validators
                     widgets = True
                     from s3.s3validators import IS_ADD_PERSON_WIDGET2, IS_LOCATION_SELECTOR2
-                    from s3.s3widgets import S3AddPersonWidget2, S3LocationSelectorWidget2, S3OrganisationChosenWidget
+                    from s3.s3widgets import S3AddPersonWidget2, S3LocationSelectorWidget2, S3SelectChosenWidget
                 else:
                     widgets = False
 
@@ -1299,7 +1297,7 @@ def customize_org_facility(**attr):
 
                     s3db.hrm_human_resource.person_id.widget = None
                     
-                    table.organisation_id.widget = S3OrganisationChosenWidget()
+                    table.organisation_id.widget = S3SelectChosenWidget()
 
                 # Hide Labels when just 1 column in inline form
                 s3db.doc_document.file.label = ""

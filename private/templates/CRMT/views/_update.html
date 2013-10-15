@@ -2,7 +2,7 @@
   {{=H2( A(title_list,
            href = URL(c=request.controller, f=request.function, args="summary")),
            XML(" <i class='icon-chevron-right'></i>"),
-           " Update"
+           T(" Update")
         )}}
 {{except:}}
 {{pass}}
@@ -21,7 +21,7 @@
 {{include "key.html"}}
 <div class='form-container'>
 {{try:}}{{=form}}{{except:}}{{pass}}
- <a href='{{=URL(c=request.controller, f=request.function, args=request.args[1:])}}' class="btn btn-danger cancel" type="button">
+ <a href='{{=URL(args=request.args[1:])}}' class="btn btn-danger cancel" type="button">
   {{=T("Cancel")}}
  </a>
 </div>

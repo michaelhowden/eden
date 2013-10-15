@@ -238,7 +238,6 @@ class S3CRUD(S3Method):
                     output["title"] = title
                 output["title_list"] = crud_string(tablename, "title_list")
 
-
                 # Buttons
                 buttons = self.insert_buttons(r, "list")
                 if buttons:

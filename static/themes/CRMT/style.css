@@ -6,7 +6,7 @@ body {
     padding-top: 60px;
 }
 
-/* CRMT Styles */
+/* Global CRUD Page Styles */
 h2 {
     margin-bottom: 0px;
     float: left;
@@ -346,6 +346,16 @@ form#summary-filter-form
     /* Hide the colon */
     display: none;
 }
+
+/* Video Page */
+#video-table-of-contents {
+    clear: left;
+}
+
+.video-header {
+    padding-top: 50px;
+}
+
 /* Adjust Field Widths to match Titles/Data */
 #sub_human_resourcehuman_resource_human_resourcehuman_resource_i_organisation_id_edit_none,
 #sub_human_resourcehuman_resource_human_resourcehuman_resource_i_organisation_id_edit_0 {
