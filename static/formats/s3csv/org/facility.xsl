@@ -9,6 +9,8 @@
          CSV fields:
          Name....................org_facility.name
          Type....................org_facility.type comma-sep list
+         Type Grandparent........org_facility.type parent_facility_type_id
+         Type Parent.............org_facility.type parent_facility_type_id
          Organisation............org_organisation.name
          Organisation Group......org_site_org_group.group_id  
          Building................gis_location.name
@@ -92,6 +94,8 @@
         <!-- Create the variables -->
         <xsl:variable name="FacilityName" select="substring(col[@field='Name']/text(),1,64)"/>
         <xsl:variable name="Type" select="col[@field='Type']/text()"/>
+        <xsl:variable name="TypeGrandparent" select="col[@field='Type Grandparent']/text()"/>
+        <xsl:variable name="TypeParent" select="col[@field='Type Parent']/text()"/>
         <xsl:variable name="OrgName">
             <xsl:call-template name="GetColumnValue">
                 <xsl:with-param name="colhdrs" select="$Organisation"/>

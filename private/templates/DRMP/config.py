@@ -192,7 +192,7 @@ settings.pr.request_gender = False
 settings.org.site_label = "Office"
 # Disable the use of Organisation Branches
 settings.org.branches = False
-
+settings.org.hierarchical_facility_types = True
 
 # -----------------------------------------------------------------------------
 # Project

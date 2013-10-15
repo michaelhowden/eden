@@ -1688,6 +1688,12 @@ class S3Config(Storage):
 
         return enabled
 
+def get_org_hierarchical_facility_types(self):
+        """
+            Whether to allow facility_type to be hierarchical
+        """
+        return self.org.get("hierarchical_facility_types", False)
+
     # -------------------------------------------------------------------------
     # Persons
     def get_pr_request_dob(self):

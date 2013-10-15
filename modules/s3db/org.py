@@ -2244,9 +2244,39 @@ class S3FacilityModel(S3Model):
         # Facility Types (generic)
         #
         tablename = "org_facility_type"
+        
+
+        hierarchical = current.deployment_settings.get_org_hierarchical_facility_types()
+
+        if not hierarchical:
+            represent = S3Represent(lookup=tablename, 
+                                    translate=True)
+        else:
+            represent = S3Represent(labels="%(represent)s",
+                                    fields = ["represent"],
+                                    lookup=tablename, 
+                                    translate=True)
+
         table = define_table(tablename,
                              Field("name",
                                    label=T("Name"),
+                                   ),
+                             Field("represent",
+                                   label=T("Name"),
+                                   writable=False,
+                                   ),
+                             Field("parent_facility_type_id",
+                                   "reference org_facility_type",
+                                   label = T("Parent"),
+                                   represent=represent,
+                                   ondelete="RESTRICT",
+                                   requires=IS_NULL_OR(
+                                                IS_ONE_OF(db, 
+                                                          "org_facility_type.id",
+                                                          "%(name)s",
+                                                          sort=True,
+                                                          )
+                                                       ),
                                    ),
                              s3_comments(),
                              *s3_meta_fields()
@@ -2292,6 +2322,11 @@ class S3FacilityModel(S3Model):
         configure(tablename,
                   deduplicate = self.org_facility_type_duplicate,
                   )
+
+        if hierarchical:
+            configure(tablename,
+                      onaccept = self.org_facility_type_onaccept,
+                      )
 
         # ---------------------------------------------------------------------
         # Facilities (generic)
@@ -2570,6 +2605,42 @@ class S3FacilityModel(S3Model):
         return dict(org_facility_type_id = facility_type_id,
                     org_facility_geojson = self.org_facility_geojson
                     )
+
+    # ---------------------------------------------------------------------
+    @staticmethod
+    def org_facility_type_onaccept(form):
+        """
+            * if deployment_settings.get_org_hierarchical_facility_types
+            * Updates Represent Field for Facility Types
+        """
+
+        db = current.db
+
+        table = current.s3db.org_facility_type
+        vars = form.vars
+
+        id = vars.id
+        parent_id = vars.id
+        existing_name = vars.name
+
+        #Update the represent for the field 
+        parent_name = db(table.id == vars.parent_facility_type_id
+                         ).select(table.name,
+                                  limitby=(0,1)
+                                  ).first().name
+        represent = "%s > %s" % (parent_name, existing_name)
+        db(table.id == id).update(represent = represent)
+
+        #If the represent has changed, update the represents of the children
+        if vars.represent != represent:
+            children = db(table.parent_facility_type_id == id
+                          ).select(table.id,
+                                   table.name)
+            for child in children:
+                db(table.id == child.id
+                   ).update(represent = "%s > %s" % (represent,
+                                                     child.name)
+                            )
 
     # -------------------------------------------------------------------------
     @staticmethod
