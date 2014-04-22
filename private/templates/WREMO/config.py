@@ -98,10 +98,10 @@ settings.security.audit_write = audit_write
 
 # -----------------------------------------------------------------------------
 # Pre-Populate
-settings.base.prepopulate = ["CRMT"]
+settings.base.prepopulate = ["WREMO"]
 
-settings.base.system_name = T("Community Resilience Mapping Tool")
-settings.base.system_name_short = T("CRMT")
+settings.base.system_name = T("Get Connected Wellington")
+settings.base.system_name_short = T("WREMO Sahana")
 
 # -----------------------------------------------------------------------------
 # Theme (folder to use for views/layout.html)
