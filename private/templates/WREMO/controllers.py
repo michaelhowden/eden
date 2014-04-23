@@ -66,8 +66,6 @@ for(var i=0,len=layers.length;i<len;i++){
  if(layer.name=='All Coalitions'){layer.setVisibility(true)}}
 '''
         gis = current.gis
-        config = gis.get_config()
-        config.zoom = 8
         map = gis.show_map(width=770,
                            height=600,
                            callback=callback,

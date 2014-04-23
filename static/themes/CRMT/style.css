@@ -418,3 +418,8 @@ div.map_legend_panel {
 #page-footer #footer-copyrights {
     border-top: 0;
 }
+
+#show-add-btn {
+    position: relative;
+    z-index: 1000;
+}
