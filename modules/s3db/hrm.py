@@ -36,6 +36,7 @@ __all__ = ("S3HRModel",
            "S3HRAppraisalModel",
            "S3HRExperienceModel",
            "S3HRProgrammeModel",
+           "S3HRMShiftModel",
            "hrm_AssignMethod",
            "hrm_HumanResourceRepresent",
            #"hrm_TrainingEventRepresent",
@@ -4120,6 +4121,89 @@ class S3HRProgrammeModel(S3Model):
                 item.method = item.METHOD.UPDATE
 
 # =============================================================================
+class S3HRMShiftModel(S3Model):
+    """
+        Shifts for an Incident whcih can have Human Resources assigned
+    """
+
+    names = ("hrm_shift",
+             "hrm_shift_human_resource",
+             )
+
+    def model(self):
+
+        T = current.T
+
+        # ---------------------------------------------------------------------
+        # Link table between Posts & Incidents
+        tablename = "hrm_shift"
+        self.define_table(tablename,
+                          self.event_event_id(ondelete = "CASCADE"),
+                          #self.event_incident_id(ondelete = "CASCADE"),
+                          self.hrm_human_resource_id(empty = False,
+                                                     ondelete = "RESTRICT",
+                                                     label = T("Shift Leader"),
+                                                     ),
+                          s3_datetime("start_datetime",
+                                      default = "now",
+                                      label = T("Start"),
+                                      ),
+                          s3_datetime("end_datetime",
+                                      default = current.request.utcnow + datetime.timedelta(hours=12),
+                                      label = T("End"),
+                                      ),
+                           *s3_meta_fields())
+
+        current.response.s3.crud_strings[tablename] = Storage(
+            label_create = T("Start Shift"),
+            title_display = T("Shift Details"),
+            title_list = T("Shifts"),
+            title_update = T("Edit Shift"),
+            label_list_button = T("List Shifts"),
+            label_delete_button = T("Delete Shift"),
+            msg_record_created = T("Shift started"),
+            msg_record_modified = T("Shift updated"),
+            msg_record_deleted = T("Shift removed"),
+            msg_list_empty = T("No Shifts"))
+
+        represent = S3Represent(lookup=tablename, 
+                                fields = ["hrm_shift.start_datetime","hrm_shift.end_datetime"],
+                                translate=True)
+
+        hrm_shift_id = S3ReusableField("hrm_shift_id", "reference %s" % tablename,
+                                       label = T("Shift"),
+                                       ondelete = "RESTRICT",
+                                       #represent = represent,
+                                       requires = IS_EMPTY_OR(
+                                                      IS_ONE_OF(db, "hrm_shift.id",
+                                                                #represent,
+                                                                orderby="hrm_shift.start_datetime",
+                                                                sort=True)
+                                                                ),
+                                       sortby = "hrm_shift.start_datetime",
+                                       )
+
+        self.add_components(tablename,
+                            hrm_shift_human_resource = "hrm_shift_id",
+                            )
+
+        # ---------------------------------------------------------------------
+        # Link table between Posts & Incident Types
+        tablename = "hrm_shift_human_resource"
+        self.define_table(tablename,
+                          hrm_shift_id(writable = False,
+                                       readable = False
+                                       ),
+                          self.hrm_human_resource_id(empty = False,
+                                                     ondelete = "RESTRICT",
+                                                     ),
+                          Field("shift_position"),
+                          *s3_meta_fields())
+
+        # Pass names back to global scope (s3.*)
+        return dict()
+
+# =============================================================================
 def hrm_programme_hours_month(row):
     """
         Virtual field for hrm_programme_hours - returns the date of the first
@@ -4201,6 +4285,8 @@ def hrm_programme_hours_onaccept(form):
         if row:
             dtable.insert(human_resource_id = row.id,
                           active = active)
+
+
 
 # =============================================================================
 class hrm_AssignMethod(S3Method):

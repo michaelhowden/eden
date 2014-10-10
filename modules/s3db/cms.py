@@ -1199,6 +1199,9 @@ def cms_customise_post_fields():
     if settings.get_cms_show_events():
         lappend("event_post.event_id")
 
+    if settings.get_cms_show_incidents():
+        lappend("event_post.incident_id")
+
     if settings.get_cms_location_click_filters():
         script = \
 '''S3.filter_location=function(d){var cb

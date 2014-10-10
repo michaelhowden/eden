@@ -1832,11 +1832,29 @@ class S3Config(Storage):
         """
         return self.cms.get("richtext", False)
 
+    def get_cms_show_series(self):
+        """
+            Whether to show Series (Types) in News Feed
+        """
+        return self.cms.get("show_series", True)
+
+    def get_cms_show_locations(self):
+        """
+            Whether to show Locations in News Feed
+        """
+        return self.cms.get("show_locations", True)
+
     def get_cms_show_events(self):
         """
             Whether to show Events in News Feed
         """
         return self.cms.get("show_events", False)
+
+    def get_cms_show_incidents(self):
+        """
+            Whether to show Incidents in News Feed
+        """
+        return self.cms.get("show_incidents", False)
 
     def get_cms_show_links(self):
         """

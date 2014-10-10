@@ -185,6 +185,9 @@ class S3EventModel(S3Model):
         # ---------------------------------------------------------------------
         tablename = "event_event"
         define_table(tablename,
+                     Field("number",
+                           label = T("Event Number"),
+                           ),
                      Field("name",      # Name could be a code
                            length = 64,   # Mayon compatibility
                            label = T("Name"),
@@ -207,6 +210,15 @@ class S3EventModel(S3Model):
                                                            # Should!
                            #                                T("Exercises mean all screens have a watermark & all notifications have a prefix."))),
                            ),
+                      Field("routine", "boolean",
+                            label = T("Routine Incident"),
+                            ),
+                      Field("eoc_activation", "boolean",
+                            label = T("EOC Activation"),
+                            ),
+                      Field("monitor_only", "boolean",
+                            label = T("Monitor Only"),
+                            ),
                      s3_datetime("start_date",
                                  default = "now",
                                  label = T("Start Date"),
@@ -224,6 +236,7 @@ class S3EventModel(S3Model):
                            label = T("Closed"),
                            represent = s3_yes_no_represent,
                            ),
+                     self.gis_location_id(),
                      s3_comments(),
                      *s3_meta_fields())
 
@@ -353,8 +366,60 @@ class S3EventModel(S3Model):
                                             #"actuate": "hide",
                                             },
                             event_event_impact = "event_id",
+                            #From Incident
+                            event_asset = "event_id",
+                            asset_asset = {"link": "event_asset",
+                                           "joinby": "event_id",
+                                           "key": "asset_id",
+                                           #"actuate": "embed",
+                                           "actuate": "hide",
+                                           #"autocomplete": "number",
+                                           "autodelete": False,
+                                           },
+                            event_human_resource = "event_id",
+                            hrm_human_resource = {"link": "event_human_resource",
+                                                  "joinby": "event_id",
+                                                  "key": "human_resource_id",
+                                                  "actuate": "hide",
+                                                  "autodelete": False,
+                                                  },
+                            event_organisation = "event_id",
+                            event_resource = "event_id",
+                            org_organisation = {"link": "event_organisation",
+                                                "joinby": "event_id",
+                                                "key": "organisation_id",
+                                                #"actuate": "embed",
+                                                "actuate": "hide",
+                                                #"autocomplete": "name",
+                                                "autodelete": False,
+                                                },
+                            event_site = "event_id",
+                            event_sitrep = {"name": "event_sitrep",
+                                            "joinby": "event_id",
+                                            },
+                            doc_sitrep = {"link": "event_sitrep",
+                                          "joinby": "event_id",
+                                          "key": "sitrep_id",
+                                          "actuate": "replace",
+                                          #"autocomplete": "name",
+                                          "autodelete": True,
+                                          },
+                            project_task = {"link": "event_task",
+                                            "joinby": "event_id",
+                                            "key": "task_id",
+                                            "actuate": "replace",
+                                            #"autocomplete": "name",
+                                            "autodelete": True,
+                                            },
+                            hrm_shift = "event_id",
                             )
 
+        # Custom Method to Assign HRs
+        self.set_method("event", "event",
+                   method = "assign",
+                   action = self.hrm_AssignMethod(component="human_resource"))
+
+        # Custom Method to Dispatch HRs
         self.set_method("event", "event",
                         method = "dispatch",
                         action = event_notification_dispatcher)
@@ -601,6 +666,9 @@ class S3IncidentModel(S3Model):
                                               ),
                           self.event_incident_type_id(),
                           self.scenario_scenario_id(),
+                          Field("number",
+                                label = T("Incident Number"),
+                                ),
                           Field("name", notnull=True, # Name could be a code
                                 length=64,
                                 label = T("Name"),
@@ -664,6 +732,10 @@ class S3IncidentModel(S3Model):
                                       #comment = DIV(_class="tooltip",
                                       #              _title="%s|%s" % (T("Incident"),
                                       #                                current.messages.AUTOCOMPLETE_HELP))
+                                      comment = S3AddResourceLink(c="event",
+                                                                  f="incident",
+                                                                  title=T("Create Incident")),
+
                                       )
 
         # @ToDo: Move this workflow into Templates?
@@ -713,6 +785,7 @@ class S3IncidentModel(S3Model):
                                                   "autodelete": False,
                                                   },
                             event_organisation = "incident_id",
+                            event_resource = "incident_id",
                             org_organisation = {"link": "event_organisation",
                                                 "joinby": "incident_id",
                                                 "key": "organisation_id",
@@ -751,6 +824,7 @@ class S3IncidentModel(S3Model):
                                           "autocomplete": "name",
                                           "autodelete": True,
                                           },
+                            hrm_shift = "incident_id",
                             )
 
         # Custom Method to Assign HRs
@@ -1049,11 +1123,11 @@ class S3EventResourceModel(S3Model):
                           super_link("data_id", "stats_data"),
                           super_link("track_id", "sit_trackable"),
                           # Resources are normally managed at the Incident level
-                          #self.event_event_id(ondelete = "CASCADE",
+                          self.event_event_id(ondelete = "CASCADE",
                           #                    # enable in template if-required
                           #                    readable = False,
                           #                    writable = False,
-                          #                    ),
+                                              ),
                           self.event_incident_id(ondelete = "CASCADE"),
                           # This is a component, so needs to be a super_link
                           # - can't override field name, ondelete or requires
@@ -1698,12 +1772,13 @@ class S3EventHRModel(S3Model):
         self.define_table(tablename,
                           # Instance table
                           self.super_link("cost_item_id", "budget_cost_item"),
-                          #self.event_event_id(ondelete = "CASCADE",
+                          self.event_event_id(ondelete = "CASCADE"),
+                          #self.event_event_id(ondelete = "CASCADE"),
                           #                    # Enable in template if-desired
                           #                    readable = False,
                           #                    writable = False,
                           #                    ),
-                          self.event_incident_id(ondelete = "CASCADE"),
+                          #self.event_incident_id(ondelete = "CASCADE"),
                           # @ToDo: Add Warning?
                           self.hrm_human_resource_id(empty = False,
                                                      ondelete = "RESTRICT",
@@ -1922,7 +1997,7 @@ class S3EventOrganisationModel(S3Model):
 
         tablename = "event_organisation"
         self.define_table(tablename,
-                          #self.event_event_id(),
+                          self.event_event_id(ondelete = "CASCADE"),
                           self.event_incident_id(empty = False,
                                                  ondelete = "CASCADE",
                                                  ),
@@ -1983,6 +2058,7 @@ class S3EventSiteModel(S3Model):
         self.define_table(tablename,
                           # Instance table
                           super_link("cost_item_id", "budget_cost_item"),
+                          self.event_event_id(ondelete = "CASCADE"),
                           self.event_incident_id(empty = False,
                                                  ondelete = "CASCADE",
                                                  ),
@@ -2083,7 +2159,6 @@ class S3EventSitRepModel(S3Model):
     """
 
     names = ("event_sitrep",
-             "event_sitrep_id",
              )
 
     def model(self):
@@ -2096,7 +2171,7 @@ class S3EventSitRepModel(S3Model):
 
         tablename = "event_sitrep"
         self.define_table(tablename,
-                          #self.event_event_id(ondelete = "CASCADE"),
+                          self.event_event_id(ondelete = "CASCADE"),
                           self.event_incident_id(empty = False,
                                                  ondelete = "CASCADE",
                                                  ),
@@ -2620,48 +2695,47 @@ def event_rheader(r):
 
     rheader = None
 
-    if r.representation == "html":
+    # @ToDo Fix why and r.record? 
+    if r.representation == "html" and r.record:
 
         T = current.T
         settings = current.deployment_settings
+        table = r.table
+        record = r.record
 
+        #@ToDo: Fix hack - have deployment settings to control
         if r.name == "event":
             # Event Controller
             tabs = [(T("Event Details"), None),
+                    (T("Incidents"), "incident"),
                     ]
             if settings.has_module("cr"):
-                tabs.append((T("Shelters"), "event_shelter"))
+                tabs.append((T("Shelters"), "shelter"))
             #if settings.has_module("req"):
             #    tabs.append((T("Requests"), "req"))
-            if settings.has_module("msg"):
-                tabs.append((T("Send Notification"), "dispatch"))
             
-            rheader_tabs = s3_rheader_tabs(r, tabs)
-
-            event = r.record
-            if event:
-                if event.exercise:
-                    exercise = TH(T("EXERCISE"))
-                else:
-                    exercise = TH()
-                if event.closed:
-                    closed = TH(T("CLOSED"))
-                else:
-                    closed = TH()
-                table = r.table
-                rheader = DIV(TABLE(TR(exercise),
-                                    TR(TH("%s: " % table.name.label),
-                                       event.name),
+            rheader_fields = [TR(TH("%s: " % table.name.label),
+                                       record.name),
                                     TR(TH("%s: " % table.comments.label),
-                                       event.comments),
+                                       record.comments),
                                     TR(TH("%s: " % table.start_date.label),
-                                       table.start_date.represent(event.start_date)),
-                                    TR(closed),
-                                    ), rheader_tabs)
+                                       table.start_date.represent(record.start_date))
+                              ]
 
         if r.name == "incident":
             # Incident Controller
             tabs = [(T("Incident Details"), None)]
+
+            rheader_fields = [TR(TH("%s: " % table.name.label),
+                                   record.name),
+                                TR(TH("%s: " % table.comments.label),
+                                   record.comments),
+                                TR(TH("%s: " % table.zero_hour.label),
+                                   table.zero_hour.represent(record.zero_hour))
+                              ]
+
+       #@ToDo: Fix hack - have deployment settings to control
+        if r.name == "event":
             append = tabs.append
             if settings.has_module("project"):
                 append((T("Tasks"), "task"))
@@ -2674,33 +2748,27 @@ def event_rheader(r):
                 append((T("Assets"), "asset"))
             tabs.extend(((T("Facilities"), "site"), # Inc Shelters
                          (T("Organizations"), "organisation"),
+                         (T("Resources"), "resource"),
                          (T("SitReps"), "sitrep"),
                          (T("Map Configuration"), "config"),
                          ))
             if settings.has_module("msg"):
                 append((T("Send Notification"), "dispatch"))
-            rheader_tabs = s3_rheader_tabs(r, tabs)
+            append((T("Shifts"), "shift"))
 
-            record = r.record
-            if record:
-                if record.exercise:
-                    exercise = TH(T("EXERCISE"))
-                else:
-                    exercise = TH()
-                if record.closed:
-                    closed = TH(T("CLOSED"))
-                else:
-                    closed = TH()
-                table = r.table
-                rheader = DIV(TABLE(TR(exercise),
-                                    TR(TH("%s: " % table.name.label),
-                                       record.name),
-                                    TR(TH("%s: " % table.comments.label),
-                                       record.comments),
-                                    TR(TH("%s: " % table.zero_hour.label),
-                                       table.zero_hour.represent(record.zero_hour)),
-                                    TR(closed),
-                                    ), rheader_tabs)
+        if record:
+            if record.exercise:
+                exercise = TH(T("EXERCISE"))
+            else:
+                exercise = TH()
+            if record.closed:
+                closed = TH(T("CLOSED"))
+            else:
+                closed = TH()
+            rheader = DIV(TABLE(TR(exercise),
+                                rheader_fields,
+                                TR(closed),
+                                ), s3_rheader_tabs(r, tabs))
 
     return rheader
 

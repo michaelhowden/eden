@@ -189,6 +189,9 @@ a i.icon.icon-plus-sign.big-add:hover {
 
 /* Modals */
 /* Imitate Bootstrap in jQueryUI Modal */
+
+.ui-dialog { z-index: 1050;}
+
 #popup #submit_record__row {
     text-align: right;
 }

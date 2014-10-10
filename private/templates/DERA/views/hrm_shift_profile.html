@@ -1,0 +1,38 @@
+{{extend "layout.html"}}
+
+<div class='row'>
+ <div class='span6'>
+  <div class="profile-header">
+   <a class="s3_modal" title="Edit Shift" href="/eden/hrm/shift/{{=id}}/update.popup?refresh=datalist" data-w2p_disable_with="default">
+    <i class="icon icon-edit"></i>
+   </a>
+    <h2>{{=event}}</h2>
+    <p>{{=T("Shift Leader")}}: {{=human_resource}}</p>
+    <p>{{=T("Shift")}}: {{=start}} - {{=end}}</p>
+  </div>
+
+ <div class='link'>
+  <a href='/{{=appname}}/hrm/shift_human_resource/datalist'>
+   <h3 ><i class='icon-contact'></i> {{=T("Personnel Roster Assigned")}}</h3>
+  </a>
+ </div>
+  <a class='s3_modal' title='Assign Personnel' href='/{{=appname}}/hrm/shift_human_resource/create.popup?hrm_shift_id={{=id}}&refresh=hrm_shift_human_resource_datalist' data-w2p_disable_with='default'>
+    <i class='icon icon-plus-sign small-add'></i>
+  </a>
+ {{=hrm_shift_human_resource_datalist}}
+</div>
+
+ <div class='span6'>
+ <div class='link'>
+  <a href='/{{=appname}}/cms/newsfeed/datalist'>
+   <h3 ><i class='icon-newspaper-o'></i> {{=T("Activity Log")}}</h3>
+  </a>
+ </div>
+  <a class='s3_modal' title='Log Activity' href='/{{=appname}}/cms/newsfeed/create.popup?~.(event)={{=event_id}}&refresh=cms_newsfeed_datalist' data-w2p_disable_with='default'>
+    <i class='icon icon-plus-sign small-add'></i>
+  </a>
+ {{=cms_newsfeed_datalist}}
+</div>
+
+
+{{include "dataLists.html"}}

@@ -342,7 +342,10 @@ def newsfeed():
     contact_field = settings.get_cms_person()
     org_field = settings.get_cms_organisation()
     org_group_field = settings.get_cms_organisation_group()
+    show_series = settings.get_cms_show_series()
+    show_locations = settings.get_cms_show_locations()
     show_events = settings.get_cms_show_events()
+    show_incidents = settings.get_cms_show_incidents()
 
     hidden = not settings.get_cms_filter_open()
 
@@ -351,20 +354,29 @@ def newsfeed():
                                    label = T("Search"),
                                    _class = "filter-search",
                                    #_placeholder = T("Search").upper(),
-                                   ),
-                      S3LocationFilter("location_id",
-                                       label = T("Filter by Location"),
-                                       hidden = hidden,
-                                       ),
+                                   )
                       ]
     fappend = filter_widgets.append
     finsert = filter_widgets.insert
+
+    if show_locations:
+        fappend(S3LocationFilter("location_id",
+                                 label = T("Filter by Location"),
+                                 hidden = hidden,
+                                 ))
 
     if show_events:
         fappend(S3OptionsFilter("event_post.event_id",
                                 label = T("Filter by Disaster"),
                                 hidden = hidden,
                                 ))
+
+    if show_incidents:
+        fappend(S3OptionsFilter("event_post.incident_id",
+                                label = T("Filter by Incident"),
+                                hidden = hidden,
+                                ))
+
 
     if org_field:
         fappend(S3OptionsFilter(org_field,
@@ -409,28 +421,29 @@ def newsfeed():
                                    hidden = hidden,
                                    ))
 
-    len_series = db(stable.deleted == False).count()
-    if len_series > 3:
-        # Multiselect widget
-        finsert(1, S3OptionsFilter("series_id",
-                                   label = T("Filter by Type"),
-                                   # We want translations
-                                   #represent = "%(name)s",
-                                   hidden = hidden,
-                                   ))
-                      
-    elif len_series > 1:
-        # Checkboxes
-        finsert(1, S3OptionsFilter("series_id",
-                                   label = T("Filter by Type"),
-                                   # We want translations
-                                   #represent = "%(name)s",
-                                   cols = 2,
-                                   hidden = hidden,
-                                   ))
-    else:
-        # No Widget
-        pass
+    if show_series:
+        len_series = db(stable.deleted == False).count()
+        if len_series > 3:
+            # Multiselect widget
+            finsert(1, S3OptionsFilter("series_id",
+                                       label = T("Filter by Type"),
+                                       # We want translations
+                                       #represent = "%(name)s",
+                                       hidden = hidden,
+                                       ))
+                          
+        elif len_series > 1:
+            # Checkboxes
+            finsert(1, S3OptionsFilter("series_id",
+                                       label = T("Filter by Type"),
+                                       # We want translations
+                                       #represent = "%(name)s",
+                                       cols = 2,
+                                       hidden = hidden,
+                                       ))
+        else:
+            # No Widget
+            pass
 
     notify_fields = [(T("Type"), "series_id"),
                      (T("Date"), "date"),
@@ -521,26 +534,33 @@ def newsfeed():
             location_id = get_vars.get("~.(location)", None)
             if location_id:
                 table.location_id.default = location_id
+
             event_id = get_vars.get("~.(event)", None)
-            if event_id:
+            incident_id = get_vars.get("~.(incident)", None)
+            if event_id or incident_id:
                 def create_onaccept(form):
                     table = current.s3db.event_post
                     table.insert(event_id=event_id,
+                                 incident_id=incident_id,
                                  post_id=form.vars.id)
 
                 s3db.configure("cms_post",
                                create_onaccept = create_onaccept, 
                                )
 
-            crud_fields = ["date",
-                           "series_id",
-                           ]
+            crud_fields = ["date",]
             cappend = crud_fields.append
+
+            if show_series:
+                cappend("series_id")
+
             if settings.get_cms_show_tags():
                 cappend("title")
-            crud_fields.extend(("body",
-                                "location_id",
-                                ))
+
+            cappend("body")
+
+            if show_locations:
+                cappend("location_id")
             if not event_id and show_events:
                 cappend(S3SQLInlineComponent("event_post",
                                              # @ToDo: deployment_setting (use same one used to activate?)
@@ -549,6 +569,13 @@ def newsfeed():
                                              multiple = False,
                                              fields = [("", "event_id")],
                                              orderby = "event_id$name",
+                                             ))
+            if not incident_id and show_incidents:
+                cappend(S3SQLInlineComponent("event_post",
+                                             label = T("Incident"),
+                                             multiple = False,
+                                             fields = [("", "incident_id")],
+                                             orderby = "incident_id$name",
                                              ))
             if org_field == "post_organisation.organisation_id":
                 cappend(S3SQLInlineComponent("post_organisation",

@@ -1,0 +1,43 @@
+div.link {
+    float: left;
+}
+
+.icon-plus-sign.small-add {
+    top: 17px;
+}
+
+.link:hover h3,
+.link:hover a,
+.links a:hover {
+    color: #37518b;
+    text-decoration:none;
+}
+
+.links a:hover h3 {
+    color: inherit;
+}
+
+.homepage .dl {
+    padding: 5px 2px;
+}
+
+.dl-empty {
+    clear: both;
+}
+
+.thumbnail {
+    background: url('../../img/semi_white_75.png') !important;
+/*
+        border: none ;
+    border-radius: 0;
+    box-shadow: none;
+    */
+}
+
+.thumbnail:hover {
+    background-color: white !important;
+}
+
+.cms-edit {
+    display: none;
+}

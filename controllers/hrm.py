@@ -682,4 +682,23 @@ def compose():
 
     return s3db.hrm_compose()
 
+# =============================================================================
+def shift():
+    """
+        RESTful CRUD controller for Shifts
+    """
+
+    output = s3_rest_controller()
+    return output
+# -----------------------------------------------------------------------------
+def shift_human_resource():
+    """
+        RESTful CRUD controller for Shifts
+    """
+
+    hrm_shift_id = get_vars.get("hrm_shift_id", None)
+    s3db.hrm_shift_human_resource.hrm_shift_id.default = hrm_shift_id
+
+    output = s3_rest_controller()
+    return output
 # END =========================================================================
