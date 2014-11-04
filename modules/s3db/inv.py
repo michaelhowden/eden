@@ -394,9 +394,14 @@ class S3InventoryModel(S3Model):
         # ondelete references have been set to RESTRICT because the inv. items
         # should never be automatically deleted
         inv_item_status_opts = self.inv_item_status_opts
+        direct_stock_edits = settings.get_inv_direct_stock_edits()        
 
         tablename = "inv_inv_item"
         self.define_table(tablename,
+                          self.pr_person_id("person_id",
+                                            label = T("Contact Person"),
+                                            widget = S3AddPersonWidget2(controller="pr"),
+                                            ),
                           # This is a component, so needs to be a super_link
                           # - can't override field name, ondelete or requires
                           self.super_link("site_id", "org_site",
@@ -426,7 +431,7 @@ class S3InventoryModel(S3Model):
                                 represent = lambda v: \
                                     IS_FLOAT_AMOUNT.represent(v, precision=2),
                                 requires = IS_FLOAT_IN_RANGE(0, None),
-                                writable = False,
+                                writable = direct_stock_edits ,
                                 ),
                           Field("bin", "string", length=16,
                                 label = T("Bin"),
@@ -634,7 +639,6 @@ $.filterOptionsS3({
                            ]
 
         # Configuration
-        direct_stock_edits = settings.get_inv_direct_stock_edits()
         self.configure(tablename,
                        # Lock the record so that it can't be meddled with
                        # - unless explicitly told to allow this
@@ -3410,7 +3414,7 @@ def inv_recv_crud_strings():
 # =============================================================================
 def inv_send_rheader(r):
     """ Resource Header for Send """
-
+    settings = current.deployment_settings
     if r.representation == "html" and r.name == "send":
         record = r.record
         if record:

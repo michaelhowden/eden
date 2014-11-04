@@ -249,7 +249,7 @@ def req_controller(template = False):
                 if crud_strings:
                     s3.crud_strings["req_req"] = crud_strings
                 elif type == 1:
-                    s3.crud_strings["req_req"].label_create = T("Make Supplies Request")
+                    s3.crud_strings["req_req"].label_create = T("Post a Need")
                 elif type == 3:
                     s3.crud_strings["req_req"].label_create = T("Make People Request")
 
@@ -266,7 +266,7 @@ def req_controller(template = False):
 
                 if settings.get_req_items_ask_purpose():
                     table.purpose.label = T("What the Items will be used for")
-                table.site_id.label = T("Deliver To")
+                table.site_id.label = T("Location Needed")
                 table.request_for_id.label = T("Deliver To")
                 table.requester_id.label = T("Site Contact")
                 table.recv_by_id.label = T("Delivered To")
@@ -700,8 +700,8 @@ def requester_represent(id, show_link=True):
     contact = row["pr_contact.value"]
     if contact:
         repr = "%s %s" % (repr, contact)
-    if show_link:
-        hr_type = row["hrm_human_resource.type"]
+    if show_link and False:
+        hr_type = row["pr_person.type"]
         if has_hrm and hr_type:
             if hr_type == 1:
                 controller = "hrm"
