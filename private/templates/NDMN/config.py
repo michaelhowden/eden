@@ -199,6 +199,7 @@ settings.customise_req_req_item_resource = customise_req_req_item_resource
 def customise_inv_inv_item_controller(**attr):
     s3 = current.response.s3
     s3db = current.s3db
+    tablename = "inv_inv_item"
     table = s3db[tablename]
 
     s3.crud_strings[tablename] = Storage(
