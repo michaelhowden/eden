@@ -107,7 +107,7 @@ p.quote.mb4 {
     background-size: 90% 10px, 75% 100px;
     background-position: 50% 8px;
     padding-top: 8px;
-    border-top: 1px solid white;
+    margin-top: -8px;
     background-repeat: no-repeat; 
 }
 

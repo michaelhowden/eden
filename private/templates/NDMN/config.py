@@ -28,7 +28,7 @@ settings.base.system_name = T("Sahana - National Donation Management Network DEM
 settings.base.system_name_short = T("Sahana")
 
 # PrePopulate data
-settings.base.prepopulate = ("NDMN", "default/users")
+settings.base.prepopulate = ("NDMN",)
 
 # Theme (folder to use for views/layout.html)
 settings.base.theme = "NDMN"
@@ -124,6 +124,10 @@ settings.ui.summary = [#{"common": True,
                        # "name": "cms",
                        # "widgets": [{"method": "cms"}]
                        # },
+                      {"common": True,
+                        "name": "add",
+                        "widgets": [{"method": "create"}],
+                        },
                        {"name": "table",
                         "label": "Table",
                         "widgets": [{"method": "datatable"}]
@@ -165,6 +169,10 @@ def customise_req_req_resource(r, tablename):
         msg_record_deleted = T("Need Canceled"),
         msg_list_empty = T("No Needs Posted"))
 
+    s3db.configure(tablename,
+                   listadd = True,
+                   )
+
 settings.customise_req_req_resource = customise_req_req_resource
 # -----------------------------------------------------------------------------
 def customise_req_req_item_resource(r, tablename):
@@ -188,44 +196,67 @@ def customise_req_req_item_resource(r, tablename):
 settings.customise_req_req_item_resource = customise_req_req_item_resource
 
 # -----------------------------------------------------------------------------
-def customise_inv_inv_item_resource(r, tablename):
+def customise_inv_inv_item_controller(**attr):
     s3 = current.response.s3
     s3db = current.s3db
     table = s3db[tablename]
-    if r.interactive:
-        s3.crud_strings[tablename] = Storage(
-            label_create = T("Make a General Offer"),
-            title_display = T("General Offer"),
-            title_list = T("General Offers"),
-            title_update = T("Edit General Offer"),
-            label_list_button = T("List General Offer"),
-            label_delete_button = T("Remove General Offer"),
-            msg_record_created = T("General Offer added"),
-            msg_record_modified = T("General Offer updated"),
-            msg_record_deleted = T("General Offer removed"),
-            msg_list_empty = T("No General Offers currently recorded"))
 
-        list_fields = ["person_id",
-                       "site_id",
-                       "item_id",
-                       "item_pack_id",
-                       "quantity",
-                       "expiry_date",
-                       "pack_value",
-                       #"owner_org_id",
-                       "comments",
-                       ]
+    s3.crud_strings[tablename] = Storage(
+        label_create = T("Make a General Offer"),
+        title_display = T("General Offer"),
+        title_list = T("General Offers"),
+        title_update = T("Edit General Offer"),
+        label_list_button = T("List General Offer"),
+        label_delete_button = T("Remove General Offer"),
+        msg_record_created = T("General Offer added"),
+        msg_record_modified = T("General Offer updated"),
+        msg_record_deleted = T("General Offer removed"),
+        msg_list_empty = T("No General Offers currently recorded"))
 
-        crud_form = S3SQLCustomForm(*list_fields)
+    list_fields = ["person_id",
+                   "site_id",
+                   "item_id",
+                   "item_pack_id",
+                   "quantity",
+                   "expiry_date",
+                   "pack_value",
+                   #"owner_org_id",
+                   "comments",
+                   ]
 
-        s3db.configure(tablename,
-                       list_fields = list_fields,
-                       crud_form = crud_form,
-                       )
+    crud_form = S3SQLCustomForm(*list_fields)
 
-settings.customise_inv_inv_item_resource = customise_inv_inv_item_resource
+    s3db.configure(tablename,
+                   addbtn = True,
+                   listadd = True,
+                   list_fields = list_fields,
+                   crud_form = crud_form,
+                   )
+    return attr
 
+settings.customise_inv_inv_item_controller = customise_inv_inv_item_controller
+# -----------------------------------------------------------------------------
+def customise_org_facility_resource(r, tablename):
+    # CRUD strings
+    current.response.s3.crud_strings[tablename] = Storage(
+        label_create = T("Create Warehouse"),
+        title_display = T("Warehouse Details"),
+        title_list = T("Warehouses"),
+        title_update = T("Edit Warehouse"),
+        title_upload = T("Import Warehouses"),
+        title_map = T("Map of Warehouses"),
+        label_list_button = T("List Warehouses"),
+        label_delete_button = T("Delete Warehouse"),
+        msg_record_created = T("Warehouse added"),
+        msg_record_modified = T("Warehouse updated"),
+        msg_record_deleted = T("Warehouse deleted"),
+        msg_list_empty = T("No Warehouses currently registered"))
 
+    current.s3db.configure("inv_inv_item",
+                   addbtn = True,
+                   listadd = True,
+                   )
+settings.customise_org_facility_resource = customise_org_facility_resource
 # -----------------------------------------------------------------------------
 # Comment/uncomment modules here to disable/enable them
 # Modules menu is defined in modules/eden/menu.py
@@ -291,18 +322,18 @@ settings.modules = OrderedDict([
         restricted = True,
         module_type = 1
     )),
-    #("hrm", Storage(
-    #    name_nice = T("Staff"),
-    #    #description = "Human Resources Management",
-    #    restricted = True,
-    #    module_type = 2,
-    #)),
-    #("vol", Storage(
-    #    name_nice = T("Volunteers"),
-    #    #description = "Human Resources Management",
-    #    restricted = True,
-    #    module_type = 2,
-    #)),
+    ("hrm", Storage(
+        name_nice = T("Staff"),
+        #description = "Human Resources Management",
+        restricted = True,
+        module_type = 2,
+    )),
+    ("vol", Storage(
+        name_nice = T("Volunteers"),
+        #description = "Human Resources Management",
+        restricted = True,
+        module_type = 2,
+    )),
     #("cms", Storage(
     #  name_nice = T("Content Management"),
     #  #description = "Content Management System",

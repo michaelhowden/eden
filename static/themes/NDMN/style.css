@@ -41,3 +41,7 @@ div.link {
 .cms-edit {
     display: none;
 }
+
+#component .req_key {
+    margin-top: 7px;
+}

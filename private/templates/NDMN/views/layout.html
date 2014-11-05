@@ -71,18 +71,22 @@
    <div class='nav-collapse collapse'>
     <ul class='nav'>
     
-     <li><a href='/{{=appname}}/req/req/create?type=1'><i class='icon-flag'></i> {{=T("Post a Need")}}</a></li>
-     <li><a href='/{{=appname}}/req/req/summary'><i class='icon-check'></i> {{=T("Match a Posted Need")}}</a></li>
-
+     <li><a href='/{{=appname}}/req/req/summary'><i class='icon-check'></i> {{=T("Posted Needs")}}</a></li>
+     <li><a href='/{{=appname}}/inv/inv_item/summary'><i class='icon-dropbox'></i> {{=T("Make a General Offer")}}</a></li>
+     {{if  auth.user and auth.user.email == "organization@example.com":}}
+     <li><a href='/{{=appname}}/org/facility' tabindex='-1' class='menu-item'><i class='icon-home'></i> {{=T("Warehouses")}}</a></li>
+     <li><a href='/{{=appname}}/vol/volunteer' tabindex='-1' class='menu-item'><i class='icon-contact'></i> {{=T("Volunteers")}}</a></li>
+     <li><a href='/{{=appname}}/gis/index'><i class='icon-map'></i> {{=T("Map")}}</a></li>
      <li class='dropdown'> <a href='#' class='dropdown-toggle disabled top-level' id='more' data-toggle='dropdown'><i class='icon-plus-sign'></i> {{=T("More")}}<b class='caret'></b></a>
       <ul class='dropdown-menu' role='menu' aria-labelledby='more'>
-       <li role='menuitem'><a href='/{{=appname}}/gis/index'><i class='icon-map'></i> {{=T("Map")}}</a></li>
        <li role='menuitem'><a href='/{{=appname}}/org/organisation/datalist' tabindex='-1' class='menu-item'><i class='icon-sitemap'></i> {{=T("Organizations")}}</a></li>
-       <li role='menuitem'><a href='/{{=appname}}/org/facility' tabindex='-1' class='menu-item'><i class='icon-home'></i> {{=T("Warehouses")}}</a></li>
        <li role='menuitem'><a href='/{{=appname}}/pr/person' tabindex='-1' class='menu-item'><i class='icon-contact'></i> {{=T("People")}}</a></li>
        <li role='menuitem'><a href='/{{=appname}}/supply/catalog_item' tabindex='-1' class='menu-item'><i class='icon-cubes'></i> {{=T("Item Catalog")}}</a></li>
       </ul>
      </li>
+     {{else:}}
+     <li><a href='/{{=appname}}/gis/index'><i class='icon-map'></i> {{=T("Map")}}</a></li>
+     {{pass}}
     </ul>
     <ul class='nav pull-right'>
      {{if auth.is_logged_in():}}
