@@ -28,16 +28,16 @@
   <div class='row'>
    {{if  auth.user and auth.user.email == "organization@example.com":}}
    <div class='span4 first_stl'>
-    <h2><a href='/{{=appname}}/req/req_item/create?type=1'><i class='icon-flag'></i> {{=T("Post a Need")}}</a></li></h2>
+    <h2><a href='/{{=appname}}/req/req/create?type=1'><i class='icon-flag'></i> {{=T("Post a Need")}}</a></li></h2>
     <p class='quote mb4'>{{=T("Organizations can post their needs which can be matched by donations")}}</p>
    </div>
    <div class='span4 stl'>
-    <h2><a href='/{{=appname}}/req/req_item/summary'><i class='icon-check'></i> {{=T("Match a Posted Need")}}</a></li></h2>
+    <h2><a href='/{{=appname}}/req/req/summary'><i class='icon-check'></i> {{=T("Match a Posted Need")}}</a></li></h2>
     <p class='quote mb4'>{{=T("Review the posted Needs below and try to match an existing Need")}}</p>
    </div>
    {{else:}}
    <div class='span4 stl'>
-    <h2><a href='/{{=appname}}/req/req_item/summary'><i class='icon-check'></i> {{=T("Match a Posted Need")}}</a></li></h2>
+    <h2><a href='/{{=appname}}/req/req/summary'><i class='icon-check'></i> {{=T("Match a Posted Need")}}</a></li></h2>
     <p class='quote mb4'>{{=T("Review the posted Needs below and try to match an existing Need")}}</p>
    </div>
    <div class='span4 stl'>
